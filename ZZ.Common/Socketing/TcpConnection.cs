@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ZZ.Common.Socketing.BufferManagement;
 
 namespace ZZ.Common.Socketing
 {
@@ -14,7 +15,8 @@ namespace ZZ.Common.Socketing
         private readonly SocketAsyncEventArgs _receiveSocketAsyncEvent;
         private readonly SocketAsyncEventArgs _sendSocketAsyncEvent;
         private readonly ConcurrentQueue<byte[]> _sendQueue;
-        
+        private readonly BufferPool _bufferPool;
+
         private int _sending = 0;
         private int _receiving = 0;
         public TcpConnection(Socket socket, SocketSetting socketSeting)
@@ -30,6 +32,7 @@ namespace ZZ.Common.Socketing
             _receiveSocketAsyncEvent.Completed += ReceiveSocketAsyncEvent_Completed;
 
             _sendQueue = new ConcurrentQueue<byte[]>();
+            _bufferPool = new BufferPool(socketSeting.ReceiveBufferSize,100);
         }      
         public void Send(byte[] message)
         {
@@ -78,11 +81,27 @@ namespace ZZ.Common.Socketing
         }
         private void TryReceive()
         {
-          
+            if (!EnterReceiving()) return;
+            byte[] receiveData;
+            if (!_bufferPool.TryGet(out receiveData))
+            {
+                ExitReceiving();
+                return;
+            }
+            _receiveSocketAsyncEvent.SetBuffer(receiveData, 0, receiveData.Length);
+            bool isAsync=_receiveSocketAsyncEvent.AcceptSocket.ReceiveAsync(_receiveSocketAsyncEvent);
+            if (!isAsync)
+            {
+                ProcessReceive(_receiveSocketAsyncEvent);
+            }
         }
         private void ProcessReceive(SocketAsyncEventArgs socketAsyncEventArgs)
         {
-            //Task.Factory.
+            if (socketAsyncEventArgs.SocketError != SocketError.Success) return;           
+            var receiveData = socketAsyncEventArgs.Buffer;
+            //Log.InfoFormat("ClientSocket:ProcessConnect--已连接服务器{0}", socketAsyncEventArgs.ConnectSocket.RemoteEndPoint.ToString());
+            _bufferPool.Free(ref receiveData);
+            ExitReceiving();
         }
         private bool EnterReceiving()
         {
@@ -96,7 +115,7 @@ namespace ZZ.Common.Socketing
         }
         private void ReceiveSocketAsyncEvent_Completed(object sender, SocketAsyncEventArgs e)
         {
-            throw new NotImplementedException();
+            ProcessReceive(e);
         } 
     }
 }
