@@ -24,6 +24,7 @@ namespace ZZ.Common.Socketing.BufferManagement
         }
         public void Free(ref byte[] result)
         {
+            Array.Clear(result, 0, result.Length);
             _store.Push(result);
         }
     }

@@ -35,7 +35,7 @@ namespace ZZ.Common.Socketing
             _receiveSocketAsyncEvent.Completed += ReceiveSocketAsyncEvent_Completed;
 
             _sendQueue = new ConcurrentQueue<byte[]>();
-            _bufferPool = new BufferPool(socketSeting.ReceiveBufferSize,100);
+            _bufferPool = new BufferPool(socketSeting.ReceiveBufferSize, socketSeting.ReceiveDataBufferPoolSize);
             TryReceive();
             TrySend();
         }      
@@ -105,7 +105,7 @@ namespace ZZ.Common.Socketing
         {
             if (socketAsyncEventArgs.SocketError != SocketError.Success) return;           
             var receiveData = socketAsyncEventArgs.Buffer;
-            Log.InfoFormat("ClientSocket:ProcessConnect--已接收到数据{0}", socketAsyncEventArgs.AcceptSocket.RemoteEndPoint.ToString());
+            Log.InfoFormat("ClientSocket:ProcessConnect--已接收到数据{0}--Offset{1}", socketAsyncEventArgs.AcceptSocket.RemoteEndPoint.ToString(), socketAsyncEventArgs.Offset.ToString());
             _bufferPool.Free(ref receiveData);
             ExitReceiving();
             TryReceive();

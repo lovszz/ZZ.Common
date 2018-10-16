@@ -14,6 +14,10 @@ namespace TestClient
             EndPoint localEP = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8005);           
             var client = new ClientSocket(localEP, endPoint, new SocketSetting());
             client.Start();
+            //EndPoint endPoint2 = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8002);
+            //EndPoint localEP2 = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8006);
+            //var client2 = new ClientSocket(localEP2, endPoint, new SocketSetting());
+            //client2.Start();
             while(true)
             {
                 var message = Console.ReadLine();
