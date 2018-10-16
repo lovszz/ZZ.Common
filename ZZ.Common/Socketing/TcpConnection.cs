@@ -5,7 +5,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ZZ.Common.Logging;
 using ZZ.Common.Socketing.BufferManagement;
+using ZZ.Common.ThirdParty.Log4Net;
 
 namespace ZZ.Common.Socketing
 {
@@ -16,6 +18,7 @@ namespace ZZ.Common.Socketing
         private readonly SocketAsyncEventArgs _sendSocketAsyncEvent;
         private readonly ConcurrentQueue<byte[]> _sendQueue;
         private readonly BufferPool _bufferPool;
+        private readonly IZLog Log = Log4Netmanager.GetLog();
 
         private int _sending = 0;
         private int _receiving = 0;
@@ -33,6 +36,8 @@ namespace ZZ.Common.Socketing
 
             _sendQueue = new ConcurrentQueue<byte[]>();
             _bufferPool = new BufferPool(socketSeting.ReceiveBufferSize,100);
+            TryReceive();
+            TrySend();
         }      
         public void Send(byte[] message)
         {
@@ -41,17 +46,19 @@ namespace ZZ.Common.Socketing
         }
         private void TrySend()
         {
-            if (!EnterSending()) return;           
-            byte[] message;
-            if (_sendQueue.TryDequeue(out message))
+            if (!EnterSending()) return;
+            if (!_sendQueue.TryDequeue(out byte[] message))
             {
-                _sendSocketAsyncEvent.SetBuffer(message,0, message.Length);
-                var isAsync = _sendSocketAsyncEvent.AcceptSocket.SendAsync(_sendSocketAsyncEvent);
-                if (!isAsync)
-                {
-                    ProcessSend(_sendSocketAsyncEvent);
-                }
+                ExitSending();
+                return;
             }
+            _sendSocketAsyncEvent.SetBuffer(message, 0, message.Length);
+            var isAsync = _sendSocketAsyncEvent.AcceptSocket.SendAsync(_sendSocketAsyncEvent);
+            if (!isAsync)
+            {
+                ProcessSend(_sendSocketAsyncEvent);
+            }
+            
         }
         private void ProcessSend(SocketAsyncEventArgs socketAsyncEventArgs)
         {
@@ -82,8 +89,7 @@ namespace ZZ.Common.Socketing
         private void TryReceive()
         {
             if (!EnterReceiving()) return;
-            byte[] receiveData;
-            if (!_bufferPool.TryGet(out receiveData))
+            if (!_bufferPool.TryGet(out byte[] receiveData))
             {
                 ExitReceiving();
                 return;
@@ -99,9 +105,10 @@ namespace ZZ.Common.Socketing
         {
             if (socketAsyncEventArgs.SocketError != SocketError.Success) return;           
             var receiveData = socketAsyncEventArgs.Buffer;
-            //Log.InfoFormat("ClientSocket:ProcessConnect--已连接服务器{0}", socketAsyncEventArgs.ConnectSocket.RemoteEndPoint.ToString());
+            Log.InfoFormat("ClientSocket:ProcessConnect--已接收到数据{0}", socketAsyncEventArgs.AcceptSocket.RemoteEndPoint.ToString());
             _bufferPool.Free(ref receiveData);
             ExitReceiving();
+            TryReceive();
         }
         private bool EnterReceiving()
         {

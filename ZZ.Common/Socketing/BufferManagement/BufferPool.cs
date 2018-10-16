@@ -11,7 +11,8 @@ namespace ZZ.Common.Socketing.BufferManagement
 
         public BufferPool(int bufferSize,int initialCount)
         {
-            for(int i=0;i< initialCount;i++)
+            _store = new ConcurrentStack<byte[]>();
+            for (int i=0;i< initialCount;i++)
             {
                 var item = new byte[bufferSize];
                 _store.Push(item);

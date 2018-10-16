@@ -77,9 +77,9 @@ namespace ZZ.Common.Socketing
         {
             Task.Run(() => {
                 TcpConnection tcpConnection = new TcpConnection(socket, _socketSetting);
-                _clientSocketDict.TryAdd(Guid.NewGuid(), tcpConnection);
-                Log.InfoFormat("ServerSocket:OnProcessAccepted AcceptSocket.RemoteEndPoint:{0}-线程ID-{1}", socket.RemoteEndPoint.ToString(),Thread.CurrentThread.ManagedThreadId);
-            });            
+                _clientSocketDict.TryAdd(Guid.NewGuid(), tcpConnection);                
+            });
+            Log.InfoFormat("ServerSocket:OnProcessAccepted AcceptSocket.RemoteEndPoint:{0}-线程ID-{1}", socket.RemoteEndPoint.ToString(), Thread.CurrentThread.ManagedThreadId);
         }
     }
 }
