@@ -35,7 +35,7 @@ namespace ZZ.Common.Socketing
             _receiveSocketAsyncEvent.Completed += ReceiveSocketAsyncEvent_Completed;
 
             _sendQueue = new ConcurrentQueue<byte[]>();
-            _bufferPool = new BufferPool(socketSeting.ReceiveBufferSize, socketSeting.ReceiveDataBufferPoolSize);
+            _bufferPool = new BufferPool(socketSeting.ReceiveBufferSize, socketSeting.ReceiveDataBufferPoolSize, socketSeting.ReceiveDataBufferPoolMaxSize, socketSeting.ReceiveDataBufferPoolMinSize);
             TryReceive();
             TrySend();
         }      
@@ -89,7 +89,8 @@ namespace ZZ.Common.Socketing
         private void TryReceive()
         {
             if (!EnterReceiving()) return;
-            if (!_bufferPool.TryGet(out byte[] receiveData))
+            var receiveData = _bufferPool.Get();
+            if (receiveData==null)
             {
                 ExitReceiving();
                 return;
@@ -106,7 +107,7 @@ namespace ZZ.Common.Socketing
             if (socketAsyncEventArgs.SocketError != SocketError.Success) return;           
             var receiveData = socketAsyncEventArgs.Buffer;
             Log.InfoFormat("ClientSocket:ProcessConnect--已接收到数据{0}--Offset{1}", socketAsyncEventArgs.AcceptSocket.RemoteEndPoint.ToString(), socketAsyncEventArgs.Offset.ToString());
-            _bufferPool.Free(ref receiveData);
+            _bufferPool.Free(receiveData);
             ExitReceiving();
             TryReceive();
         }

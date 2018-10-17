@@ -2,28 +2,54 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ZZ.Common.Socketing.BufferManagement
 {
     public class BufferPool
     {
         private ConcurrentStack<byte[]> _store;
-
-        public BufferPool(int bufferSize,int initialCount)
+        private readonly int _maxSize;
+        private readonly int _minSize;
+        private readonly int _initialSisz;
+        private readonly int _bufferSize;
+        private int _index = 0;
+        public BufferPool(int bufferSize, int initialSisz, int maxSize,int minSize)
         {
+            _maxSize = maxSize;
+            _bufferSize = bufferSize;
+            _initialSisz = initialSisz;
+            _minSize = minSize;
             _store = new ConcurrentStack<byte[]>();
-            for (int i=0;i< initialCount;i++)
+            for (int i = 0; i < initialSisz; i++)
             {
                 var item = new byte[bufferSize];
                 _store.Push(item);
             }
         }
-        public bool TryGet(out byte[] result)
+        public byte[] Get()
         {
-            return _store.TryPop(out result);
+            if (_store.TryPop(out byte[] result)) return result;
+            if (Interlocked.Increment(ref _index) + _initialSisz < _maxSize)
+            {
+                result = new byte[_bufferSize];
+                return result;
+            }
+            else
+            {
+                //SpinWait这个对象暂时不清楚具体作用用来替换Thread.Sheep
+                var spin = new SpinWait();
+                while (true)
+                {
+                    if (_store.TryPop(out result)) return result;
+                    spin.SpinOnce();
+                }
+            }
         }
-        public void Free(ref byte[] result)
+        public void Free(byte[] result)
         {
+            if (_store.Count-Interlocked.Increment(ref _index) < _minSize) return;           
             Array.Clear(result, 0, result.Length);
             _store.Push(result);
         }
