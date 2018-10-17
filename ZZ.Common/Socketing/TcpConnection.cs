@@ -24,7 +24,7 @@ namespace ZZ.Common.Socketing
         private int _receiving = 0;
         public TcpConnection(Socket socket, SocketSetting socketSeting)
         {
-            _socket = socket;
+            _socket = socket;            
 
             _sendSocketAsyncEvent = new SocketAsyncEventArgs();
             _sendSocketAsyncEvent.AcceptSocket = socket;
@@ -35,10 +35,10 @@ namespace ZZ.Common.Socketing
             _receiveSocketAsyncEvent.Completed += ReceiveSocketAsyncEvent_Completed;
 
             _sendQueue = new ConcurrentQueue<byte[]>();
-            _bufferPool = new BufferPool(socketSeting.ReceiveDataBufferPoolSize, BufferFullDeal.RETURN);
+            _bufferPool = new BufferPool(socketSeting.ReceiveBufferSize, socketSeting.ReceiveDataBufferPoolSize);
             TryReceive();
             TrySend();
-        }
+        }      
         public void Send(byte[] message)
         {
             _sendQueue.Enqueue(message);
@@ -58,19 +58,19 @@ namespace ZZ.Common.Socketing
             {
                 ProcessSend(_sendSocketAsyncEvent);
             }
-
+            
         }
         private void ProcessSend(SocketAsyncEventArgs socketAsyncEventArgs)
         {
             ExitSending();
             if (socketAsyncEventArgs.SocketError == SocketError.Success)
-            {
+            {                
                 TrySend();
             }
             else
             {
                 //抛异常
-            }
+            }            
         }
         private bool EnterSending()
         {
@@ -89,13 +89,13 @@ namespace ZZ.Common.Socketing
         private void TryReceive()
         {
             if (!EnterReceiving()) return;
-            if (!_bufferPool.TryPop(out byte[] receiveData))
+            if (!_bufferPool.TryGet(out byte[] receiveData))
             {
                 ExitReceiving();
                 return;
             }
             _receiveSocketAsyncEvent.SetBuffer(receiveData, 0, receiveData.Length);
-            bool isAsync = _receiveSocketAsyncEvent.AcceptSocket.ReceiveAsync(_receiveSocketAsyncEvent);
+            bool isAsync=_receiveSocketAsyncEvent.AcceptSocket.ReceiveAsync(_receiveSocketAsyncEvent);
             if (!isAsync)
             {
                 ProcessReceive(_receiveSocketAsyncEvent);
@@ -103,13 +103,10 @@ namespace ZZ.Common.Socketing
         }
         private void ProcessReceive(SocketAsyncEventArgs socketAsyncEventArgs)
         {
-            if (socketAsyncEventArgs.SocketError != SocketError.Success) return;
+            if (socketAsyncEventArgs.SocketError != SocketError.Success) return;           
             var receiveData = socketAsyncEventArgs.Buffer;
             Log.InfoFormat("ClientSocket:ProcessConnect--已接收到数据{0}--Offset{1}", socketAsyncEventArgs.AcceptSocket.RemoteEndPoint.ToString(), socketAsyncEventArgs.Offset.ToString());
-            if(!_bufferPool.Push(receiveData))//缓冲池满则会返回失败
-            {
-                //等待处理
-            }
+            _bufferPool.Free(ref receiveData);
             ExitReceiving();
             TryReceive();
         }
@@ -126,6 +123,6 @@ namespace ZZ.Common.Socketing
         private void ReceiveSocketAsyncEvent_Completed(object sender, SocketAsyncEventArgs e)
         {
             ProcessReceive(e);
-        }
+        } 
     }
 }
