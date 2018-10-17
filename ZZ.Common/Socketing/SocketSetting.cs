@@ -24,7 +24,7 @@ namespace ZZ.Common.Socketing
         //
         //   T:System.ArgumentOutOfRangeException:
         //     The value specified for a set operation is less than 0.
-        public int ReceiveBufferSize => 2;
+        public int ReceiveBufferSize => -1;
         //
         // 摘要:
         //     Gets or sets a value that specifies the amount of time after which a synchronous
@@ -62,7 +62,7 @@ namespace ZZ.Common.Socketing
         //
         //   T:System.ArgumentOutOfRangeException:
         //     The value specified for a set operation is less than 0.
-        public int SendBufferSize => 2;
+        public int SendBufferSize => 100;
         //
         // 摘要:
         //     Gets or sets a value that specifies the amount of time after which a synchronous

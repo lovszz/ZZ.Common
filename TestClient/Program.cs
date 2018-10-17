@@ -10,21 +10,22 @@ namespace TestClient
     {
         static void Main(string[] args)
         {
-            EndPoint endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8001);           
-            EndPoint localEP = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8005);           
+            EndPoint endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8001);
+            EndPoint localEP = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8005);
             var client = new ClientSocket(localEP, endPoint, new SocketSetting());
             client.Start();
             //EndPoint endPoint2 = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8002);
             //EndPoint localEP2 = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8006);
             //var client2 = new ClientSocket(localEP2, endPoint, new SocketSetting());
             //client2.Start();
-            while(true)
+            while (true)
             {
                 var message = Console.ReadLine();
                 if (string.IsNullOrEmpty(message)) message = "0";
-                client.Send(getBytes(int.Parse(message), true));
+                byte[] msg = getBytes(int.Parse(message), true);
+                client.Send(msg);
                 Console.WriteLine("已发送");
-            }            
+            }
         }
         public static byte[] getBytes(int s, bool asc)
         {
