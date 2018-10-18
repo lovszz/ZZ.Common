@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestServer", "TestServer\Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestClient", "TestClient\TestClient.csproj", "{9A45BC88-144F-4AD3-83E0-7805B33EBD50}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Apliu.Standard.MongoDB", "Apliu.Standard.MongoDB\Apliu.Standard.MongoDB.csproj", "{6EAF13A3-A95A-4608-9650-E9D13378761D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Apliu.Standard.MongoDB", "Apliu.Standard.MongoDB\Apliu.Standard.MongoDB.csproj", "{E892A8D1-FAFB-4473-8A3A-FE299BAF2B6C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,10 @@ Global
 		{9A45BC88-144F-4AD3-83E0-7805B33EBD50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A45BC88-144F-4AD3-83E0-7805B33EBD50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A45BC88-144F-4AD3-83E0-7805B33EBD50}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6EAF13A3-A95A-4608-9650-E9D13378761D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6EAF13A3-A95A-4608-9650-E9D13378761D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6EAF13A3-A95A-4608-9650-E9D13378761D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6EAF13A3-A95A-4608-9650-E9D13378761D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E892A8D1-FAFB-4473-8A3A-FE299BAF2B6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E892A8D1-FAFB-4473-8A3A-FE299BAF2B6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E892A8D1-FAFB-4473-8A3A-FE299BAF2B6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E892A8D1-FAFB-4473-8A3A-FE299BAF2B6C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
