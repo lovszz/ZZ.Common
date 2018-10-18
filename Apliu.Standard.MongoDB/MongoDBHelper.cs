@@ -209,6 +209,24 @@ namespace Apliu.Standard.MongoDB
             InsertJson(JsonConvert.SerializeObject(objData));
         }
 
+        public void InsertByteArry(Byte[] byteArry)
+        {
+            IMongoCollection<BsonDocument> mongoCollection = GetCollection<BsonDocument>();
+            mongoCollection.InsertOne(new BsonDocument("UseData", BsonValue.Create(byteArry)));
+        }
+
+        public Byte[] FindOneAndDeleteByteArry()
+        {
+            IMongoCollection<BsonDocument> mongoCollection = GetCollection<BsonDocument>();
+            BsonDocument findResult = mongoCollection.FindOneAndDelete(Builders<BsonDocument>.Filter.Empty);
+            Byte[] byteResult = null;
+            if (findResult != null && findResult.Elements.Count() > 1)
+            {
+                byteResult = findResult.ElementAt(1).Value.AsByteArray;
+            }
+            return byteResult;
+        }
+
         /// <summary>
         /// 根据指定键值查找数据（值完全相等）
         /// </summary>

@@ -22,8 +22,7 @@ namespace TestClient
             {
                 var message = Console.ReadLine();
                 if (string.IsNullOrEmpty(message)) message = "0";
-                byte[] msg = getBytes(int.Parse(message), true);
-                client.Send(msg);
+                client.Send(getBytes(int.Parse(message), true));
                 Console.WriteLine("已发送");
             }
         }

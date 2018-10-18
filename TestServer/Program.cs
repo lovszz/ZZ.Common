@@ -8,14 +8,13 @@ namespace TestServer
     {
         static void Main(string[] args)
         {
-            int a = int.Parse("245763233145324536243643");
-            return;
             EndPoint endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8001);
             var server = new ServerSocket(endPoint, new SocketSetting());
             server.Start();
             //EndPoint endPoint2 = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8002);
             //var server2 = new ServerSocket(endPoint2, new SocketSetting());
             //server2.Start();
+            Console.ReadLine();
         }
         public static long byteArray2Long(byte[] byt, int length)
         {
