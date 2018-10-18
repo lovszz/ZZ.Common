@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Threading;
 using ZZ.Common.Socketing;
 
 namespace TestServer
@@ -8,6 +9,8 @@ namespace TestServer
     {
         static void Main(string[] args)
         {
+
+            SynchronizationContext C = new SynchronizationContext();
             EndPoint endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8001);
             var server = new ServerSocket(endPoint, new SocketSetting());
             //需要添加委托事件

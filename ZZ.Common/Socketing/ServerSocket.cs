@@ -47,6 +47,20 @@ namespace ZZ.Common.Socketing
             AcceptAsync(_acceptSocketAsyncEventArgs);
             return this;
         }
+        public void SendToALL(byte[] message)
+        {
+            foreach (var key in _clientSocketDict.Keys)
+            {
+                SendToOne(key, message);
+            }
+        }
+        public void SendToOne(Guid guid,byte[] message)
+        {
+            if (_clientSocketDict.TryGetValue(guid, out TcpConnection client))
+            {
+                client.Send(message);
+            }           
+        }
         private void AcceptAsync(SocketAsyncEventArgs socketAsyncEventArgs)
         {            
             var isAsync=_socket.AcceptAsync(socketAsyncEventArgs);

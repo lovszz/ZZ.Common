@@ -10,6 +10,7 @@ namespace TestClient
     {
         static void Main(string[] args)
         {
+            SynchronizationContext C = new SynchronizationContext();
             EndPoint endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8001);
             EndPoint localEP = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8005);
             var client = new ClientSocket(localEP, endPoint, new SocketSetting());

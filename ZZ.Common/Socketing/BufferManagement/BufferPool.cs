@@ -49,9 +49,14 @@ namespace ZZ.Common.Socketing.BufferManagement
         }
         public void Free(byte[] result)
         {
-            if (_store.Count-Interlocked.Increment(ref _index) < _minSize) return;           
+            if (_store.Count > _initialSisz)
+            {
+                Interlocked.Decrement(ref _index);
+                return;
+            }                
             Array.Clear(result, 0, result.Length);
             _store.Push(result);
+            
         }
     }
 }
